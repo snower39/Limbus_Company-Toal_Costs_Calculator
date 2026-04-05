@@ -3,3 +3,5 @@ A calculator that can calculate the shard and thread required to 4 SYNC all ID a
 
 calculator is made as Python.
 Sorry, this calculator only supports Korean.
+
+Maybe. English. Later..?
