@@ -1,0 +1,121 @@
+def limbus_calculator():
+    # 2성과 3성, 에고 동기화 재화 설정
+    # 인격 동기화 재화 (현재 동기화 -> 4 동기화)
+    id_sync_costs = {
+        2: {1: {"thread": 150, "shard": 30}, 2: {"thread": 140, "shard": 30}, 3: {"thread": 100, "shard": 30}},
+        3: {1: {"thread": 250, "shard": 50}, 2: {"thread": 230, "shard": 50}, 3: {"thread": 150, "shard": 50}}
+    }
+    # 에고 동기화 재화 (현재 동기화 -> 4 동기화)
+    ego_sync_costs = {
+        "TETH": {1: {"thread": 225, "shard": 90}, 2: {"thread": 200, "shard": 90}, 3: {"thread": 130, "shard": 90}},
+        "HE":   {1: {"thread": 260, "shard": 100}, 2: {"thread": 230, "shard": 100}, 3: {"thread": 150, "shard": 100}},
+        "WAW":  {1: {"thread": 295, "shard": 150}, 2: {"thread": 260, "shard": 150}, 3: {"thread": 170, "shard": 150}}
+    }
+    
+    id_recruit_costs = {2: 150, 3: 400} # 인격 정가 재화 설정
+    ego_recruit_costs = 400 # 에고 정가 재화 설정
+
+    sinners = ["이상", "파우스트", "돈키호테", "료슈", "뫼르소", "홍루", "히스클리프", "이스마엘", "로쟈", "싱클레어", "오티스", "그레고르"]
+
+    def sinner_calculate(name):
+        print(f"\n--- [{name}] 입력 시작 ---")
+        sinner_thread = 0
+        sinner_shard = 0
+
+        # 인격 재화 계산
+        print(f"\n[인격 계산: {name}]")
+        for star in [2, 3]:
+            total_id = int(input(f"{name}의 {star}성 인격 총 개수: "))
+            extract_id = int(input(f"보유 중인 {name}의 {star}성 인격 개수: "))
+            
+            # 미보유 인격 = 정가 재화 + 1 동기화부터 4 동기화까지 재화 합산
+            unextract_id = total_id - extract_id
+            if unextract_id > 0:
+                sinner_shard += unextract_id * (id_recruit_costs[star] + id_sync_costs[star][1]["shard"])
+                sinner_thread += unextract_id * id_sync_costs[star][1]["thread"]
+            
+            # 보유 인격 = 동기화 단계에 따른 재화 저장
+            if extract_id > 0:
+                print(f"보유한 {extract_id}개 중 4 동기화 미만인 인격의 개수를 입력하세요.")
+                id1 = int(input("1 동기화 인격 개수: "))
+                id2 = int(input("2 동기화 인격 개수: "))
+                id3 = int(input("3 동기화 인격 개수: "))
+                
+                sinner_thread += (id1 * id_sync_costs[star][1]["thread"] + id2 * id_sync_costs[star][2]["thread"] + id3 * id_sync_costs[star][3]["thread"])
+                sinner_shard += (id1 * id_sync_costs[star][1]["shard"] + id2 * id_sync_costs[star][2]["shard"] + id3 * id_sync_costs[star][3]["shard"])
+
+        # 에고 재화 계산 
+        print(f"\n[E.G.O 계산: {name}]")
+        for grade in ["TETH", "HE", "WAW"]:
+            total_ego = int(input(f"{name}의 {grade} 등급 E.G.O 총 개수: "))
+            extract_ego = int(input(f"보유 중인 {name}의 {grade} 등급 E.G.O 개수: "))
+            
+            # 미보유 에고 = 정가 재화 + 1 동기화부터 4 동기화까지 재화 합산
+            unextract_ego = total_ego - extract_ego
+            if unextract_ego > 0:
+                sinner_shard += unextract_ego * (ego_recruit_costs + ego_sync_costs[grade][1]["shard"])
+                sinner_thread += unextract_ego * ego_sync_costs[grade][1]["thread"]
+            
+            # 보유 에고 = 동기화 단계에 따른 재화 저장
+            if extract_ego > 0:
+                print(f"보유한 {extract_ego}개 중 4 동기화 미만인 E.G.O의 개수를 입력하세요.")
+                ego1 = int(input("1 동기화 에고 개수: "))
+                ego2 = int(input("2 동기화 에고 개수: "))
+                ego3 = int(input("3 동기화 에고 개수: "))
+                
+                sinner_thread += (ego1 * ego_sync_costs[grade][1]["thread"] + ego2 * ego_sync_costs[grade][2]["thread"] + ego3 * ego_sync_costs[grade][3]["thread"])
+                sinner_shard += (ego1 * ego_sync_costs[grade][1]["shard"] + ego2 * ego_sync_costs[grade][2]["shard"] + ego3 * ego_sync_costs[grade][3]["shard"])
+            
+        return sinner_thread, sinner_shard
+
+    # 메인 실행
+    print("-" * 60)
+    print("림버스 컴퍼니 자원 계산기 (인격 & E.G.O)")
+    print("1성 인격과 ZAYIN 등급 E.G.O는 계산에 포함되지 않습니다.")
+    print("-" * 60)
+    print("1: 특정 수감자만 계산")
+    print("2: 수감자 전체 계산")
+    mode = int(input("모드를 선택하세요 (1/2): "))
+
+    results = []
+
+    if mode == 1:
+        target = input(f"수감자 이름을 입력하세요 ({', '.join(sinners)}): ")
+        if target in sinners:
+            t, s = sinner_calculate(target)
+            results.append({"name": target, "thread": t, "shard": s})
+        else:
+            print("잘못된 이름입니다.")
+            return
+    elif mode == 2:
+        for i, sinner in enumerate(sinners):
+            # 해당 수감자를 계산할건지 물음
+            confirm = input(f"\n[{sinner}]를 계산하시겠습니까? (y/n): ").lower()
+            
+            if confirm == 'y':
+                t, s = sinner_calculate(sinner)
+                results.append({"name": sinner, "thread": t, "shard": s})
+            else:
+                # y를 입력하지 않으면 다음 수감자로 넘어감
+                print(f"{sinner}를 건너뜁니다.")
+    else:
+        print(f"{mode}에 해당하는 모드가 없습니다.")
+
+    # 계산 결과 출력
+    print("\n" + "="*55)
+    print("계산 결과")
+    print("-" * 55)
+    
+    total_thread = 0
+    for res in results:
+        print(f"[{res['name']}]")
+        print(f"끈: {res['thread']:,}개")
+        print(f"{res['name']} 자아 파편: {res['shard']:,}개")
+        total_thread += res['thread']
+        print("-" * 55)
+    
+    print(f"총 필요 끈: {total_thread:,}개")
+    print("="*55)
+
+if __name__ == "__main__":
+    limbus_calculator()
